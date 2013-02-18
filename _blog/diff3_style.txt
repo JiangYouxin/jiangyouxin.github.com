@@ -1,0 +1,76 @@
+前一篇大讲了git merge的优越性。但是3-way-merge也会产生冲突，手工解决是跑不了了。为了方便正确的解决冲突，最好设置冲突显示格式为diff3：
+
+git config --global merge.conflictstyle diff3
+
+这样在merge产生冲突的时候，冲突文件将包含更多的信息（即冲突部分在基准点的内容）。看下面的例子：
+
+基准版本:
+top
+this line will be deleted
+bottom
+
+分支b1的版本（增加了两行"add new line"，"add new line2"）：
+top
+this line will be deleted
+add new line
+add new line2
+bottom
+
+HEAD版本（删除了一行"this line will be deleted"，增加一行"add new line2"）：
+top
+add new line2
+bottom
+
+不使用diff3 style的冲突文件：
+top
+<<<<<<< HEAD
+add new line2
+=======
+this line will be deleted
+add new line
+add new line2
+>>>>>>> b1
+bottom
+
+这里的top和bottom两行是没有冲突的部分，中间是冲突的部分，其中：
+(1) "<<<<<<< HEAD" 与 "=======" 之间，是冲突部分在 HEAD 的内容
+(2) "=======" 与 ">>>>>>> b1" 之间，是冲突部分在 b1 分支的内容
+通过以上信息你能知道这个冲突该怎么解决么？
+估计很多人看见HEAD是b1分支的子集，会不假思索地保留b1分支内容，不是么？
+
+top
+this line will be deleted
+add new line
+add new line2
+bottom
+
+很遗憾，HEAD上曾经删除过“this line will be deleted”这一行，解决完冲突后，它又跑回来了
+
+使用diff3 style的冲突文件：
+top
+<<<<<<< HEAD
+add new line2
+||||||| merged common ancestors
+this line will be deleted
+=======
+this line will be deleted
+add new line
+add new line2
+>>>>>>> b1
+bottom
+
+同样，这里的top和bottom两行是没有冲突的部分，中间是冲突的部分，其中：
+(1) "<<<<<<< HEAD" 与 "||||||| merged common ancestors" 之间，是冲突部分在 HEAD 的内容
+(2) "||||||| merged common ancestors" 与 "=======" 之间，是冲突部分在基准点的内容
+(3) "=======" 与 ">>>>>>> b1" 之间，是冲突部分在 b1 分支的内容
+这一次多了一个基准点信息，就可以明确地看到，基准点有的这一行“this line will be deleted”，在HEAD中被删除了。所以很容易做出正确的冲突处理：
+
+top
+add new line
+add new line2
+bottom
+
+另外git pull和git rebase也有合并操作，所以也会受影响。
+再一次，请记住一定要使用diff3 style：
+
+git config --global merge.conflictstyle diff3

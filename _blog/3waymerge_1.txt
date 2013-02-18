@@ -1,0 +1,48 @@
+Git —— 如何建立二次开发的上游依赖分支和本地开发分支
+
+仍然聚焦于基于开源软件做二次开发时，合并上游修改的问题。假定上游主干版本为A，我们在A的基础上开发了A'；此时上游主干更新到B，我们要做的事情就是相应更新到B'。根据上一篇博客的结论，我们要以A为基础，生成A'和B两条分支，然后执行 git checkout B; git merge A'。
+
+那么，AB和AA'这两条分支如何生成？
+
+理想情况是：我们的上游本身就是用git管理的，B和A本身就位于同一条分支上；我们克隆了仓库，基于A创建了分支，一路修改到A'。这个时候直接merge + 处理冲突就好了。
+
+但情况很有可能是这样的：我们只有A'的提交历史，之前也没想过跟着上游同步更新这码子事情。当厂里提出这事之后，车间里才匆匆忙忙又下载了一份上游的老版本A和新版本B。于是现实是这样：
+(1) A和B是两份孤立的代码，并没有用git管理起来
+(2) A'的历史是git管理的，但历史记录里找不到基点A
+
+理想终究是理想，现实才是我们要面对的。我们要重建分支图，让现实靠近理想。
+
+1. 建立上游依赖分支AB
+
+进入A所在的目录，运行
+   
+  git init
+  git add -A
+  git commit
+  git tag depend_A
+
+进入B所在的目录
+
+  git add -A
+  git commit
+  git tag depend_B
+
+将分支和TAG推到服务器上
+
+  git remote add origin <url>
+  git push origin master:depend
+  git push origin depend_A
+  git push origin depend_B
+
+2. 建立本地开发分支AA'
+
+  git fetch
+  echo "" | git commit-tree master: -p master -p depend_A
+  git branch <SHA> -B master
+  
+3. 合并代码，生成B'
+
+  git checkout -f master
+  git merge 
+
+4. 从今往后的幸福日子

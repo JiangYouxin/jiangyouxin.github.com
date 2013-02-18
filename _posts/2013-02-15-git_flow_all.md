@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Git Flow, Why & How
+title: Git Flow, Why and How
 ---
 
 {{ page.title }}

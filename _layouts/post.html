@@ -2,6 +2,9 @@
 layout: default
 ---
 <div id="post">
+	<h1>{{ page.title }} </h1>
+	<p class="meta">{{ page.meta }}</p>
+	<p>本文地址: <a href="{{ page.url }}">{{ site.site_url }}{{ page.url }}</a>
 {{ content }}
 </div>
 

@@ -172,6 +172,12 @@ ul.posts {
     padding: 0 .2em;
   }
 
+  #post blockquote {
+    border: 1px solid #ddd;
+    background-color: #eef;
+    padding: 0 .2em;
+  }
+
     #post pre code {
       border: none;
     }

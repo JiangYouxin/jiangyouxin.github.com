@@ -14,7 +14,7 @@ meta: 2013.3.7, 北京
 
 这个时候我们向服务器推送的是一个Merge结点，它有两个父结点，同时保留了分支和主干的历史。
 
-但有时，没有权限向服务器推送Merge结点，或者没有必要把分支的历史保留得太细。这时可以新开一个分支做合并，然后把整个分支压缩（squash）为一个主干上的提交：
+但有时，没有权限向服务器推送Merge结点，或者没有必要把分支的历史保留得太细。这时可以新开一个分支做合并，然后把整个分支压缩（squash）为主干上的***一个***提交：
 
 	git checkout master -b work
 	git merge feature
@@ -25,6 +25,8 @@ meta: 2013.3.7, 北京
 	git merge work --squash --ff-only
 	git commit
 	git push
+	# 擦屁股
+	git branch -d work
 
 也可以在第一次合并时直接使用--squash参数，但这样生成的commit message会少一次合并的信息：
 
